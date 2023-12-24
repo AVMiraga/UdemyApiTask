@@ -1,10 +1,11 @@
-﻿using BlogApp.DAL.Context;
+﻿using BlogApp.Core.Entities.Common;
+using BlogApp.DAL.Context;
 using BlogApp.DAL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.DAL.Repository.Implementations
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : BaseEntity, new()
     {
         private readonly AppDbContext _context;
         private readonly DbSet<T> _Table;
@@ -34,8 +35,7 @@ namespace BlogApp.DAL.Repository.Implementations
 
         public async Task<T> GetByIdAsync(int id)
         {
-            var entity = await _Table.FindAsync(id);
-            return entity;
+            return await _Table.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<int> SaveChanges()
@@ -44,7 +44,7 @@ namespace BlogApp.DAL.Repository.Implementations
             return result;
         }
 
-        public void UpdateAsync(T entity)
+        public void Update(T entity)
         {
             _Table.Update(entity);
         }

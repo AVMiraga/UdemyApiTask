@@ -1,4 +1,11 @@
 
+using BlogApp.Business.Services.Implementations;
+using BlogApp.Business.Services.Interfaces;
+using BlogApp.DAL.Context;
+using BlogApp.DAL.Repository.Implementations;
+using BlogApp.DAL.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 namespace BlogApp.API
 {
     public class Program
@@ -7,12 +14,19 @@ namespace BlogApp.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+            builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+            });
 
             var app = builder.Build();
 
