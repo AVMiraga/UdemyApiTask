@@ -1,10 +1,13 @@
 
+using BlogApp.Business.DTOs.CategoryDTOs;
 using BlogApp.Business.Services.Implementations;
 using BlogApp.Business.Services.Interfaces;
 using BlogApp.DAL.Context;
 using BlogApp.DAL.Repository.Implementations;
 using BlogApp.DAL.Repository.Interfaces;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace BlogApp.API
 {
@@ -14,11 +17,18 @@ namespace BlogApp.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
-            builder.Services.AddControllers();
+
+            builder.Services.AddValidatorsFromAssembly(typeof(CreateCategoryDTOValidation).Assembly);
+
+            builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

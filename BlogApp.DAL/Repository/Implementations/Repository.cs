@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.DAL.Repository.Implementations
 {
-    public class Repository<T> : IRepository<T> where T : BaseEntity, new()
+    public class Repository<T> : IRepository<T> where T : BaseAuditableEntity, new()
     {
         private readonly AppDbContext _context;
         private readonly DbSet<T> _Table;
@@ -22,20 +22,24 @@ namespace BlogApp.DAL.Repository.Implementations
             return entity;
         }
 
-        public void DeleteAsync(T entity)
+        public async Task DeleteAsync(T entity)
         {
-            _Table.Remove(entity);
+            entity.IsDeleted = true;
+
+            _Table.Update(entity);
+
+            //_Table.Remove(entity);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IQueryable<T>> GetAllAsync()
         {
-            var entities = await _Table.ToListAsync();
+            var entities = _Table.Where(x => !x.IsDeleted);
             return entities;
         }
 
         public async Task<T> GetByIdAsync(int id)
         {
-            return await _Table.FirstOrDefaultAsync(x => x.Id == id);
+            return await _Table.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
         }
 
         public async Task<int> SaveChanges()

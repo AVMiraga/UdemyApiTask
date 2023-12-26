@@ -5,10 +5,10 @@ namespace BlogApp.Business.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<IQueryable<Category>> GetAllAsync();
+        Task<ICollection<GetCategoryDTO>> GetAllAsync();
         Task<Category> GetByIdAsync(int id);
-        Task<Category> AddAsync(CreateCategoryDTO entity, string imgUrl);
-        Task<Category> UpdateAsync(UpdateCategoryDTO entity, string? imgUrl);
+        Task<Category> AddAsync(CreateCategoryDTO entity);
+        Task<Category> UpdateAsync(UpdateCategoryDTO entity);
         Task Delete(int Id);
     }
 }

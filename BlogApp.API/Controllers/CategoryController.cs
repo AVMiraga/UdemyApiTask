@@ -11,16 +11,11 @@ namespace BlogApp.API.Controllers
     [Route("api/[controller]")]
     public class CategoryController : Controller
     {
-        private readonly IWebHostEnvironment _env;
         private readonly ICategoryService _categoryService;
-        private readonly AppDbContext _context;
 
-
-        public CategoryController(IWebHostEnvironment env, ICategoryService categoryService,AppDbContext context)
+        public CategoryController(ICategoryService categoryService)
         {
-            _env = env;
             _categoryService = categoryService;
-            _context = context;
         }
 
         [HttpGet]
@@ -33,18 +28,24 @@ namespace BlogApp.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
-            return StatusCode(StatusCodes.Status200OK, category);
+            try
+            {
+                var category = await _categoryService.GetByIdAsync(id);
+
+                return StatusCode(StatusCodes.Status200OK, category);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] CreateCategoryDTO entity)
         {
-            if (!ModelState.IsValid) return StatusCode(StatusCodes.Status400BadRequest, ModelState);
+            if (entity == null) return StatusCode(StatusCodes.Status400BadRequest, ModelState);
 
-            string imgUrl = entity.ImageFile.SaveImage(_env.WebRootPath, "Upload");
-
-            var category = await _categoryService.AddAsync(entity, imgUrl);
+            var category = await _categoryService.AddAsync(entity);
             return StatusCode(StatusCodes.Status201Created, category);
         }
 
@@ -53,17 +54,7 @@ namespace BlogApp.API.Controllers
         {
             if (!ModelState.IsValid) return StatusCode(StatusCodes.Status400BadRequest, ModelState);
 
-            string? imgUrl = null;
-            if (entity.ImageFile != null)
-            {
-                imgUrl = entity.ImageFile.SaveImage(_env.WebRootPath, "Upload");
-            }
-            else
-            {
-                imgUrl = _context.Categories.AsNoTracking().FirstOrDefault(x=>x.Id == entity.Id)?.ImageUrl; 
-            }
-
-            var category = await _categoryService.UpdateAsync(entity, imgUrl);
+            var category = await _categoryService.UpdateAsync(entity);
             return StatusCode(StatusCodes.Status200OK, category);
         }
 
