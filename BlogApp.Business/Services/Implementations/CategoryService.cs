@@ -55,7 +55,7 @@ namespace BlogApp.Business.Services.Implementations
 
         public async Task<ICollection<GetCategoryDTO>> GetAllAsync()
         {
-            var categories = await _rep.GetAllAsync();
+            var categories = await _rep.GetAllAsync(includes: "ChildCategories");
 
             return _mapper.Map<ICollection<GetCategoryDTO>>(categories);
         }

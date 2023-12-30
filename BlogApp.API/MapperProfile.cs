@@ -12,8 +12,10 @@ namespace BlogApp.API
 			CreateMap<CreateCategoryDTO, Category>().ReverseMap();
 			CreateMap<UpdateCategoryDTO, Category>();
 			CreateMap<UpdateCategoryDTO, Category>().ReverseMap();
-			CreateMap<GetCategoryDTO, Category>();
-			CreateMap<GetCategoryDTO, Category>().ReverseMap();
-		}
+			CreateMap<GetCategoryDTO, Category>()
+				.ForMember(gc => gc.ChildCategories, opt => opt.MapFrom(c => c.ChildCategories));
+			CreateMap<GetCategoryDTO, Category>().ReverseMap()
+                .ForMember(gc => gc.ChildCategories, opt => opt.MapFrom(c => c.ChildCategories));
+        }
 	}
 }

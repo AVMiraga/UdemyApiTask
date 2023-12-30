@@ -8,12 +8,11 @@ namespace BlogApp.DAL.Repository.Implementations
     public class Repository<T> : IRepository<T> where T : BaseAuditableEntity, new()
     {
         private readonly AppDbContext _context;
-        private readonly DbSet<T> _Table;
+        public DbSet<T> _Table => _context.Set<T>();
 
         public Repository(AppDbContext context)
         {
             _context = context;
-            _Table = _context.Set<T>();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -31,9 +30,14 @@ namespace BlogApp.DAL.Repository.Implementations
             //_Table.Remove(entity);
         }
 
-        public async Task<IQueryable<T>> GetAllAsync()
+        public async Task<IQueryable<T>> GetAllAsync(params string[] includes)
         {
             var entities = _Table.Where(x => !x.IsDeleted);
+
+            if (includes != null)
+                foreach (var include in includes)
+                    entities = entities.Include(include);
+
             return entities;
         }
 

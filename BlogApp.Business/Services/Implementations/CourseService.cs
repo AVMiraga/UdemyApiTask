@@ -52,8 +52,8 @@ namespace BlogApp.Business.Services.Implementations
 		{
 			if (Id <= 0) throw new NegativeIdException("Id Can't Be Negative Or Zero");
 
-			//Course Course = await _rep.GetByIdAsync(Id) ?? throw new CourseNotFoundException("Course Not Found");
-			//await _rep.DeleteAsync(Course);
+			// Course Course = await _rep.GetByIdAsync(Id) ?? throw new CourseNotFoundException("Course Not Found");
+			// await _rep.DeleteAsync(Course);
 			await _rep.SaveChanges();
 		}
 
